@@ -1,13 +1,18 @@
 package com.tfunsal.marketplace.service.product;
 
+import com.tfunsal.marketplace.dto.ImageDto;
+import com.tfunsal.marketplace.dto.ProductDto;
 import com.tfunsal.marketplace.exceptions.ResourceNotFoundException;
 import com.tfunsal.marketplace.model.Category;
+import com.tfunsal.marketplace.model.Image;
 import com.tfunsal.marketplace.model.Product;
 import com.tfunsal.marketplace.repository.CategoryRepository;
+import com.tfunsal.marketplace.repository.ImageRepository;
 import com.tfunsal.marketplace.repository.ProductRepository;
 import com.tfunsal.marketplace.request.AddProductRequest;
 import com.tfunsal.marketplace.request.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +24,8 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-
+    private final ModelMapper modelMapper;
+    private final ImageRepository imageRepository;
 
     @Override
     public Product addProduct(AddProductRequest request) {
@@ -123,5 +129,21 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Long countProductsByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndName(brand, name);
+    }
+
+
+    @Override
+    public List<ProductDto> getConvertedProducts(List<Product> products) {
+        return products.stream().map((this::convertToDto)).toList();
+
+    }
+
+    @Override
+    public ProductDto convertToDto(Product product) {
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
+        List<Image> images = imageRepository.findByProductId(product.getId());
+        List<ImageDto> imageDtos = images.stream().map(image -> modelMapper.map(image, ImageDto.class)).toList();
+        productDto.setImages(imageDtos);
+        return productDto;
     }
 }

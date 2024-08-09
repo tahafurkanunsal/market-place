@@ -1,5 +1,6 @@
 package com.tfunsal.marketplace.service.product;
 
+import com.tfunsal.marketplace.dto.ProductDto;
 import com.tfunsal.marketplace.model.Product;
 import com.tfunsal.marketplace.request.AddProductRequest;
 import com.tfunsal.marketplace.request.UpdateProductRequest;
@@ -30,4 +31,7 @@ public interface ProductService {
 
     Long countProductsByBrandAndName(String brand, String name);
 
+    List<ProductDto> getConvertedProducts(List<Product> products);
+
+    ProductDto convertToDto(Product product);
 }
