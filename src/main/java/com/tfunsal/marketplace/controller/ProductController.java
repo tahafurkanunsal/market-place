@@ -1,6 +1,7 @@
 package com.tfunsal.marketplace.controller;
 
 import com.tfunsal.marketplace.dto.ProductDto;
+import com.tfunsal.marketplace.exceptions.AlreadyExistsException;
 import com.tfunsal.marketplace.exceptions.ResourceNotFoundException;
 import com.tfunsal.marketplace.model.Product;
 import com.tfunsal.marketplace.request.AddProductRequest;
@@ -13,8 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("${api.prefix}/products")
@@ -49,8 +49,8 @@ public class ProductController {
             Product theProduct = productService.addProduct(request);
             ProductDto productDto = productService.convertToDto(theProduct);
             return ResponseEntity.ok(new ApiResponse("Add product success!", productDto));
-        } catch (Exception e) {
-            return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new ApiResponse(e.getMessage(), null));
+        } catch (AlreadyExistsException e) {
+            return ResponseEntity.status(CONFLICT).body(new ApiResponse(e.getMessage(), null));
         }
     }
 
