@@ -28,14 +28,8 @@ public class CartItemServiceImpl implements CartItemService {
         //3. Check if the product already in the cart
         //4. If Yes, then increase the quantity with the requested quantity
         //5. If No, then initiate a new CartItem entry.
-        Cart cart;
-        try {
-            cart = cartService.getCart(cartId);
-        } catch (ResourceNotFoundException e) {
-            cartId = cartService.initializeNewCart();
-            cart = cartService.getCart(cartId);
-        }
 
+        Cart cart = cartService.getCart(cartId);
         Product product = productService.getProductById(productId);
 
         CartItem cartItem = cart.getItems()
