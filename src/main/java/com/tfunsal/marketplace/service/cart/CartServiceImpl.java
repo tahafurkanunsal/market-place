@@ -2,6 +2,7 @@ package com.tfunsal.marketplace.service.cart;
 
 import com.tfunsal.marketplace.exceptions.ResourceNotFoundException;
 import com.tfunsal.marketplace.model.Cart;
+import com.tfunsal.marketplace.model.User;
 import com.tfunsal.marketplace.repository.CartItemRepository;
 import com.tfunsal.marketplace.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -46,10 +48,17 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Long initializeNewCart(){
-        Cart newcart = new Cart();
-        Long newCartId = cartIdGenerator.incrementAndGet();
-        newcart.setId(newCartId);
-        return cartRepository.save(newcart).getId();
+    public Cart initializeNewCart(User user) {
+        return Optional.ofNullable(getCartByUserId(user.getId()))
+                .orElseGet(() -> {
+                    Cart cart = new Cart();
+                    cart.setUser(user);
+                    return cartRepository.save(cart);
+                });
+    }
+
+    @Override
+    public Cart getCartByUserId(Long userId) {
+        return cartRepository.findByUserId(userId);
     }
 }
